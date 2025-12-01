@@ -32,7 +32,7 @@
                             <li><a href="scrap_list.jsp" class="text-white"><fmt:message key="menu.scrap"/></a></li>
 
                             <% if ("ADMIN".equals(sessionRole)) { %>
-                                <li><a href="quote_add.jsp" class="text-warning fw-bold">명언 등록</a></li>
+                                <li><a href="quote_add.jsp" class="text-warning fw-bold"><fmt:message key="menu.add"/></a></li>
                                 <li><a href="admin_approval.jsp" class="text-danger fw-bold"><fmt:message key="menu.admin"/></a></li>
                             <% } %>
                         <% } %>

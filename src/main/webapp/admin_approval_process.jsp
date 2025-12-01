@@ -32,11 +32,11 @@
         String msg = "";
 
         if ("approve".equals(mode)) {
-            // [승인] 버튼 클릭 시 -> status를 APPROVED로 변경
+            // 승인 버튼 클릭 시 status를 APPROVED로 변경
             sql = "UPDATE quote SET status = 'APPROVED' WHERE num = ?";
             msg = "승인이 완료되었습니다. 목록에 게시됩니다.";
         } else if ("delete".equals(mode)) {
-            // [삭제] 버튼 클릭 시 -> DB에서 데이터 삭제
+            // 삭제 버튼 클릭 시 DB에서 데이터 삭제
             sql = "DELETE FROM quote WHERE num = ?";
             msg = "해당 신청이 삭제(거절)되었습니다.";
         }

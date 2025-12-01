@@ -47,10 +47,20 @@
                                 <label class="form-label">명언 내용</label>
                                 <textarea class="form-control" name="content" rows="3" required placeholder="감동적인 문구를 입력하세요"></textarea>
                             </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">명언 내용(영문)</label>
+                                <textarea class="form-control" name="content_en" rows="3" required placeholder="감동적인 문구를 영문으로 입력하세요"></textarea>
+                            </div>
 
                             <div class="mb-3">
                                 <label class="form-label">저자 / 작품명</label>
                                 <input type="text" class="form-control" name="author" required placeholder="인물이나 작품을 입력하세요">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">저자 / 작품명 (영문)</label>
+                                <input type="text" class="form-control" name="author_en" required placeholder="인물이나 작품을 영문으로 입력하세요">
                             </div>
                             
                             <div class="mb-3">

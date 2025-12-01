@@ -10,6 +10,7 @@
     
     String regist_day = LocalDate.now().toString();
 
+    // 각자 DB에 맞게 수정
     String url = "jdbc:mysql://localhost:3306/QuoteLibDB?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul";
     String dbId = "root";
     String dbPw = "dongha0812";

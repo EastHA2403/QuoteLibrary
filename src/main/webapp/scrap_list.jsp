@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <%
     String sessionId = (String) session.getAttribute("sessionId");
     if (sessionId == null) {
@@ -7,13 +10,26 @@
         return;
     }
     
+    // 언어 설정 (파라미터 우선 적용)
+    String reqLang = request.getParameter("lang");
+    String currentLang = null;
+
+    if (reqLang != null && !reqLang.isEmpty()) {
+        currentLang = reqLang;
+        session.setAttribute("sessionLang", currentLang);
+    } else {
+        currentLang = (String) session.getAttribute("sessionLang");
+    }
+    if (currentLang == null) currentLang = "ko";
+
     String uploadPath = request.getContextPath() + "/resources/upload/";
 %>
 <!doctype html>
 <html lang="ko">
 <head>
     <meta charset="utf-8">
-    <title>나의 스크랩 - QuoteLibrary</title>
+    <title>QuoteLibrary</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
@@ -24,10 +40,12 @@
     </style>
 </head>
 <body>
+    <jsp:include page="language_setup.jsp" />
+    
     <jsp:include page="menu.jsp" />
 
     <main class="container py-5">
-        <h2 class="mb-4 fw-bold text-warning">⭐ 나의 스크랩 보관함</h2>
+        <h2 class="mb-4 fw-bold text-warning"><fmt:message key="scrap.title"/></h2>
         
         <div class="row mb-2">
             <%
@@ -43,7 +61,6 @@
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     conn = DriverManager.getConnection(url, dbId, dbPw);
 
-                    // 현재 로그인한 사용자의 스크랩 목록을 가져옴
                     String sql = "SELECT q.*, s.num AS scrap_id " + 
                                  "FROM quote q JOIN scrap s ON q.num = s.quote_num " +
                                  "WHERE s.member_id = ? ORDER BY s.num DESC";
@@ -57,11 +74,23 @@
                     while (rs.next()) {
                         hasData = true;
                         int scrapId = rs.getInt("scrap_id");
+                        
                         String content = rs.getString("content");
                         String author = rs.getString("author");
+                        String contentEn = rs.getString("content_en"); // 영어 데이터
+                        String authorEn = rs.getString("author_en");
+                        
                         String date = rs.getString("regist_day");
                         String imgFile = rs.getString("img_file");
                         String category = rs.getString("category");
+
+                        // 영어 설정 시 영문 데이터로 교체
+                        if ("en".equals(currentLang) && contentEn != null && !contentEn.isEmpty()) {
+                            content = contentEn;
+                            author = authorEn;
+                        }
+                        
+                        String categoryKey = "cat." + category + ".title";
 
                         String cardStyle = "";
                         if (imgFile != null && !imgFile.isEmpty()) {
@@ -72,7 +101,9 @@
             <div class="col-md-6">
                 <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative quote-card" style="<%= cardStyle %>">
                     <div class="col p-4 d-flex flex-column position-static">
-                        <strong class="d-inline-block mb-2 text-warning"><%= category %></strong>
+                        <strong class="d-inline-block mb-2 text-warning">
+                            <fmt:message key="<%= categoryKey %>"/>
+                        </strong>
                         
                         <h3 class="mb-3 fs-4 fw-bold">"<%= content %>"</h3>
                         
@@ -80,7 +111,10 @@
                         <div class="mb-auto text-white-50 small"><%= date %></div>
                         
                         <div class="mt-3">
-                            <a href="scrap_delete.jsp?scrap_id=<%= scrapId %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('보관함에서 삭제하시겠습니까?');">🗑️ 삭제</a>
+                            <a href="scrap_delete.jsp?scrap_id=<%= scrapId %>" class="btn btn-sm btn-outline-danger" 
+                               onclick="return confirm('<fmt:message key="msg.confirm.delete"/>');">
+                                <fmt:message key="btn.delete"/>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -91,8 +125,8 @@
                     if (!hasData) {
             %>
                 <div class="col-12 py-5 text-center">
-                    <h5 class="text-white-50">아직 스크랩한 명언이 없습니다.</h5>
-                    <a href="main.jsp" class="btn btn-primary mt-3">명언 보러 가기</a>
+                    <h5 class="text-white-50"><fmt:message key="scrap.empty"/></h5>
+                    <a href="main.jsp" class="btn btn-primary mt-3"><fmt:message key="btn.go.main"/></a>
                 </div>
             <%
                     }

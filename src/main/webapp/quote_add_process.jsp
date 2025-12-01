@@ -26,6 +26,8 @@
     String category = mr.getParameter("category");
     String content = mr.getParameter("content");
     String author = mr.getParameter("author");
+    String content_en = mr.getParameter("content_en");
+    String author_en = mr.getParameter("author_en");
     
     String img_file = mr.getFilesystemName("img_file");
 
@@ -51,7 +53,7 @@
         Class.forName("com.mysql.cj.jdbc.Driver");
         conn = DriverManager.getConnection(url, dbId, dbPw);
 
-        String sql = "INSERT INTO quote (content, author, category, img_file, regist_day, status, nickname) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO quote (content, author, category, img_file, regist_day, status, nickname, content_en, author_en) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, content);
@@ -61,6 +63,8 @@
         pstmt.setString(5, regist_day);
         pstmt.setString(6, status);
         pstmt.setString(7, sessionId); // 신청자의 ID로 닉네임 설정
+        pstmt.setString(8, content_en);
+        pstmt.setString(9, author_en);
 
         pstmt.executeUpdate();
 

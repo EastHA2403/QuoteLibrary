@@ -37,7 +37,9 @@
                             <th>번호</th>
                             <th>이미지</th>
                             <th class="w-25">내용</th> <!-- 내용이 길면 너비 조정 -->
+                            <th class="w-25">영문 내용</th> <!-- 내용이 길면 너비 조정 -->
                             <th>저자</th>
+                            <th>영문 저자</th>
                             <th>카테고리</th>
                             <th>신청자</th>
                             <th>신청일</th>
@@ -58,26 +60,31 @@
                                 Class.forName("com.mysql.cj.jdbc.Driver");
                                 conn = DriverManager.getConnection(url, dbId, dbPw);
                                 
-                                // 승인된 것만 가져옴
                                 String sql = "SELECT * FROM quote WHERE status = 'PENDING' ORDER BY num ASC";
                                 pstmt = conn.prepareStatement(sql);
                                 rs = pstmt.executeQuery();
                                 
                                 boolean hasData = false;
-                                
-                                // 목록 생성
                                 while(rs.next()) {
                                     hasData = true;
                                     int num = rs.getInt("num");
                                     String content = rs.getString("content");
                                     String author = rs.getString("author");
                                     String category = rs.getString("category");
-                                    String nickname = rs.getString("nickname"); // 신청자 아이디랑 동일
+                                    String nickname = rs.getString("nickname"); 
                                     String date = rs.getString("regist_day");
                                     String img = rs.getString("img_file");
                                     
+                                    // DB에서 영문 데이터 가져오기
+                                    String contentEn = rs.getString("content_en");
+                                    String authorEn = rs.getString("author_en");
+                                    
                                     // 내용이 너무 길면 자르기
-                                    if(content.length() > 20) content = content.substring(0, 20) + "...";
+                                    if(content.length() > 15) content = content.substring(0, 15) + "...";
+                                    
+                                    if(contentEn != null && contentEn.length() > 15) contentEn = contentEn.substring(0, 15) + "...";
+                                    if(contentEn == null) contentEn = "-"; // 없으면 하이픈 표시
+                                    if(authorEn == null) authorEn = "-";
                         %>
                         <tr>
                             <td><%= num %></td>
@@ -89,25 +96,28 @@
                                 <% } %>
                             </td>
                             <td class="text-start"><%= content %></td>
+                            
+                            <td class="text-start text-muted"><%= contentEn %></td>
+                            
                             <td><%= author %></td>
+                            
+                            <td><%= authorEn %></td>
+                            
                             <td><span class="badge bg-secondary"><%= category %></span></td>
                             <td><%= nickname %></td>
                             <td><%= date %></td>
                             <td>
-                                <!-- 승인 버튼 -->
-                                <a href="admin_approval_process.jsp?mode=approve&num=<%= num %>" class="btn btn-sm btn-success" onclick="return confirm('이 명언을 승인하시겠습니까?');">승인</a>
-                                
-                                <!-- 삭제 버튼 -->
-                                <a href="admin_process.jsp?mode=delete&num=<%= num %>" class="btn btn-sm btn-danger" onclick="return confirm('정말 삭제(거절)하시겠습니까?');">삭제</a>
+                                <a href="admin_approval_process.jsp?mode=approve&num=<%= num %>" class="btn btn-sm btn-success" onclick="return confirm('승인하시겠습니까?');">승인</a>
+                                <a href="admin_approval_process.jsp?mode=delete&num=<%= num %>" class="btn btn-sm btn-danger" onclick="return confirm('삭제하시겠습니까?');">삭제</a>
                             </td>
                         </tr>
                         <%
-                                } // 목록 생성 종료
+                                } // while 끝
                                 
                                 if(!hasData) {
                         %>
                             <tr>
-                                <td colspan="8" class="py-5 text-muted">승인 대기 중인 명언이 없습니다.</td>
+                                <td colspan="10" class="py-5 text-muted">승인 대기 중인 명언이 없습니다.</td>
                             </tr>
                         <%
                                 }
